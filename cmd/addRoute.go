@@ -63,7 +63,7 @@ func init() {
 }
 
 func addToRouteFile(routeName string, routeInfo RouteInfo) {
-	filename := "routes/" + strings.ToLower(routeName) + ".routes.go"
+	filename := "server/routes/" + strings.ToLower(routeName) + ".routes.go"
 
 	fileContent, err := os.ReadFile(filename)
 	if err != nil {
@@ -102,7 +102,7 @@ func addToRouteFile(routeName string, routeInfo RouteInfo) {
 }
 
 func addToControllerFile(routeName string, routeInfo RouteInfo) {
-	filename := "controllers/" + strings.ToLower(routeName) + ".controller.go"
+	filename := "server/controllers/" + strings.ToLower(routeName) + ".controller.go"
 
 	fileContent, err := os.ReadFile(filename)
 	if err != nil {

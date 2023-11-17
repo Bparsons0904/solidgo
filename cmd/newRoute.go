@@ -98,7 +98,7 @@ func init() {
 }
 
 func createRouteFile(filename string, routeInfo RouteInfo) {
-	file, err := os.Create("routes/" + filename + ".routes.go")
+	file, err := os.Create("server/routes/" + filename + ".routes.go")
 	if err != nil {
 		fmt.Println("Unable to create file:", err)
 		os.Exit(1)
@@ -147,7 +147,7 @@ func getModuleName() (string, error) {
 }
 
 func createControllerFile(filename string, routeInfo RouteInfo) {
-	file, err := os.Create("controllers/" + filename + ".controller.go")
+	file, err := os.Create("server/controllers/" + filename + ".controller.go")
 	if err != nil {
 		fmt.Println("Unable to create file:", err)
 		os.Exit(1)
@@ -170,7 +170,7 @@ func createControllerFile(filename string, routeInfo RouteInfo) {
 }
 
 func updateMainRoutesFile(routeName string) {
-	filename := "routes/routes.go"
+	filename := "server/routes/routes.go"
 
 	// Read the existing file
 	fileContent, err := os.ReadFile(filename)

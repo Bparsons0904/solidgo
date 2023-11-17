@@ -62,14 +62,16 @@ type RouteInfo struct {
 }
 
 var newRouteCmd = &cobra.Command{
-	Use:   "route [route name]",
-	Short: "Create a new route",
-	Long:  `Creates a new route file with a specified route group and an initial route.`,
-	Args:  cobra.MinimumNArgs(1),
+	Use:     "route [route name]",
+	Aliases: []string{"n"},
+	Short:   "Create a new route",
+	Long:    `Creates a new route file with a specified route group and an initial route.`,
+	Args:    cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		routeName := args[0]
 		httpMethod, _ := cmd.Flags().GetString("method")
 		functionName, _ := cmd.Flags().GetString("function")
+		pathName, _ := cmd.Flags().GetString("path")
 
 		caseType := cases.Title(language.English)
 		if httpMethod == "" {
@@ -82,6 +84,10 @@ var newRouteCmd = &cobra.Command{
 			functionName = "Get" + titledRouteName
 		}
 
+		if pathName == "" {
+			pathName = strings.ToLower(routeName)
+		}
+
 		moduleName, err := getModuleName()
 		if err != nil {
 			fmt.Println("Error reading module name:", err)
@@ -91,7 +97,7 @@ var newRouteCmd = &cobra.Command{
 		routeInfo := RouteInfo{
 			RouteName:    titledRouteName,
 			RouteVar:     strings.ToLower(routeName) + "Routes",
-			URLPath:      strings.ToLower(routeName),
+			URLPath:      pathName,
 			HTTPMethod:   httpMethod,
 			FunctionName: functionName,
 			ModuleName:   moduleName,

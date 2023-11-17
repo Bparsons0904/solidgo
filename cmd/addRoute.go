@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -11,14 +12,16 @@ import (
 )
 
 var addRouteCmd = &cobra.Command{
-	Use:   "add [route name]",
-	Short: "Add a route to an existing file",
-	Long:  `Adds a new route to an existing route and controller file.`,
-	Args:  cobra.MinimumNArgs(1),
+	Use:     "add [route name]",
+	Aliases: []string{"a"},
+	Short:   "Add a route to an existing file",
+	Long:    `Adds a new route to an existing route and controller file.`,
+	Args:    cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		routeName := args[0]
 		httpMethod, _ := cmd.Flags().GetString("method")
 		functionName, _ := cmd.Flags().GetString("function")
+		pathName, _ := cmd.Flags().GetString("path")
 
 		caseType := cases.Title(language.English)
 		if httpMethod == "" {
@@ -31,6 +34,10 @@ var addRouteCmd = &cobra.Command{
 			functionName = "Get" + titledRouteName
 		}
 
+		if pathName == "" {
+			pathName = strings.ToLower(routeName)
+		}
+
 		moduleName, err := getModuleName()
 		if err != nil {
 			fmt.Println("Error reading module name:", err)
@@ -40,7 +47,7 @@ var addRouteCmd = &cobra.Command{
 		routeInfo := RouteInfo{
 			RouteName:    titledRouteName,
 			RouteVar:     strings.ToLower(routeName) + "Routes",
-			URLPath:      strings.ToLower(routeName),
+			URLPath:      pathName,
 			HTTPMethod:   httpMethod,
 			FunctionName: functionName,
 			ModuleName:   moduleName,
@@ -83,6 +90,15 @@ func addToRouteFile(routeName string, routeInfo RouteInfo) {
 	}
 
 	fmt.Printf("Successfully added new route to %s\n", filename)
+
+	sortedContent := sortRoutes(updatedContent)
+
+	// Write the updated, sorted content back to the file
+	err = os.WriteFile(filename, []byte(sortedContent), 0644)
+	if err != nil {
+		fmt.Printf("Error writing to file %s: %v\n", filename, err)
+		return
+	}
 }
 
 func addToControllerFile(routeName string, routeInfo RouteInfo) {
@@ -108,4 +124,40 @@ func addToControllerFile(routeName string, routeInfo RouteInfo) {
 	}
 
 	fmt.Printf("Successfully added new controller function to %s\n", filename)
+}
+
+func sortRoutes(fileContent string) string {
+	lines := strings.Split(fileContent, "\n")
+	var beforeRoutes, routes, afterRoutes []string
+	insideRoutesBlock := false
+	foundGroupDefinition := false
+
+	for _, line := range lines {
+		trimmedLine := strings.TrimSpace(line)
+		if trimmedLine == "" {
+			continue
+		}
+		if strings.HasSuffix(trimmedLine, "{") {
+			insideRoutesBlock = true
+			beforeRoutes = append(beforeRoutes, line)
+		} else if strings.HasPrefix(trimmedLine, "}") {
+			insideRoutesBlock = false
+			afterRoutes = append(afterRoutes, line)
+		} else if insideRoutesBlock {
+			if strings.Contains(trimmedLine, ".Group(") {
+				beforeRoutes = append(beforeRoutes, line)
+				foundGroupDefinition = true
+			} else if foundGroupDefinition && strings.Contains(trimmedLine, "Routes.") {
+				routes = append(routes, trimmedLine)
+			}
+		} else {
+			beforeRoutes = append(beforeRoutes, line)
+		}
+	}
+
+	sort.Slice(routes, func(i, j int) bool {
+		return routes[i] < routes[j]
+	})
+
+	return strings.Join(beforeRoutes, "\n") + "\n\t" + strings.Join(routes, "\n\t") + "\n" + strings.Join(afterRoutes, "\n")
 }

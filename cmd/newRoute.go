@@ -1,19 +1,3 @@
-// package cmd
-
-// import (
-// 	"github.com/spf13/cobra"
-// 	// Other imports...
-// )
-
-// var newRouteCmd = &cobra.Command{
-// 	// Command definition...
-// }
-
-// func init() {
-// 	routeCmd.AddCommand(newRouteCmd)
-// 	// Set up flags and other configurations for newRouteCmd
-// }
-
 package cmd
 
 import (
@@ -104,6 +88,7 @@ var newRouteCmd = &cobra.Command{
 		}
 
 		createRouteFile(routeName, routeInfo)
+		updateMainRoutesFile(titledRouteName)
 		createControllerFile(routeName, routeInfo)
 	},
 }
@@ -182,4 +167,38 @@ func createControllerFile(filename string, routeInfo RouteInfo) {
 	}
 
 	fmt.Println("Controller file created successfully:", filename)
+}
+
+func updateMainRoutesFile(routeName string) {
+	filename := "routes/routes.go"
+
+	// Read the existing file
+	fileContent, err := os.ReadFile(filename)
+	if err != nil {
+		fmt.Printf("Error reading file %s: %v\n", filename, err)
+		return
+	}
+
+	content := string(fileContent)
+	insertionMarker := "// Insert new routes here - Do not remove this comment"
+	newRouteRegistration := fmt.Sprintf("\t%sRoutes(api)\n", routeName)
+
+	// Find the insertion point
+	insertionIndex := strings.Index(content, insertionMarker)
+	if insertionIndex == -1 {
+		fmt.Println("Insertion marker not found in the file:", filename)
+		return
+	}
+
+	insertionPoint := insertionIndex + len(insertionMarker) + 1
+
+	updatedContent := content[:insertionPoint] + newRouteRegistration + content[insertionPoint:]
+
+	err = os.WriteFile(filename, []byte(updatedContent), 0644)
+	if err != nil {
+		fmt.Printf("Error writing to file %s: %v\n", filename, err)
+		return
+	}
+
+	fmt.Println("Successfully updated main routes file:", filename)
 }

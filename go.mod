@@ -2,7 +2,10 @@ module solidgo
 
 go 1.21.0
 
-require github.com/spf13/cobra v1.8.0
+require (
+	github.com/spf13/cobra v1.8.0
+	golang.org/x/text v0.14.0
+)
 
 require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect

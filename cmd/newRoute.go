@@ -46,7 +46,7 @@ type RouteInfo struct {
 }
 
 var newRouteCmd = &cobra.Command{
-	Use:     "route [route name]",
+	Use:     "new [route name]",
 	Aliases: []string{"n"},
 	Short:   "Create a new route",
 	Long:    `Creates a new route file with a specified route group and an initial route.`,
@@ -121,7 +121,7 @@ func createRouteFile(filename string, routeInfo RouteInfo) {
 }
 
 func getModuleName() (string, error) {
-	file, err := os.Open("go.mod")
+	file, err := os.Open("server/go.mod")
 	if err != nil {
 		return "", err
 	}

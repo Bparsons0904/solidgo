@@ -32,7 +32,7 @@ To install SolidGo, follow these steps:
 
 5. (Optional) Move the binary to a directory in your PATH for global access:
    ```bash
-   mv solidgo /usr/local/bin/
+   sudo mv solidgo /usr/local/bin/
    ```
 
 ## Usage

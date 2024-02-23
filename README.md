@@ -9,7 +9,7 @@ To install SolidGo, follow these steps:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-repo/solidgo.git
+   git clone https://github.com/t/https://github.com/Bparsons0904/solidgo.git
    ```
 
 2. Navigate to the cloned directory:
@@ -30,10 +30,17 @@ To install SolidGo, follow these steps:
    go install
    ```
 
-5. (Optional) Move the binary to a directory in your PATH for global access:
+5. (Optional) Linux: Move the binary to a directory in your PATH for global access:
    ```bash
    sudo mv solidgo /usr/local/bin/
    ```
+
+6. (Optional) Mac(Apple Silicon): Compile with variables and move to PATH for global access
+    ```bash
+    GOOS=darwin GOARCH=arm64 go build -o solidgo
+    sudo mv solidgo /usr/local/bin/
+    ```
+
 
 ## Usage
 
